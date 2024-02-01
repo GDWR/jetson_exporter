@@ -1,5 +1,8 @@
 # Jetson Exporter
 
+> [!CAUTION]
+> Project is currently under creation, not ready for use.
+
 Prometheus exporter for the Nvidia Jetson family.
 
 Supported devices:
