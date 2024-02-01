@@ -1,0 +1,9 @@
+[Unit]
+Description=A prometheus exporter for the Nvidia Jetson family
+
+[Service]
+ExecStart=/usr/bin/env jetsonexporter
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
