@@ -2,6 +2,10 @@ package main
 
 import (
 	"bufio"
+	"github.com/alecthomas/kingpin/v2"
+	"github.com/prometheus/common/promlog/flag"
+	"github.com/prometheus/common/version"
+	"github.com/prometheus/exporter-toolkit/web"
 	"net/http"
 	"os"
 	"os/exec"
@@ -12,6 +16,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/prometheus/common/promlog"
+	webflag "github.com/prometheus/exporter-toolkit/web/kingpinflag"
 )
 
 var (
@@ -86,7 +91,20 @@ var (
 )
 
 func main() {
-	logger := promlog.New(&promlog.Config{})
+
+	var (
+		webConfig   = webflag.AddFlags(kingpin.CommandLine, ":9102")
+		metricsPath = kingpin.Flag("web.telemetry-path", "Path under which to expose metrics.").Default("/metrics").String()
+	)
+
+	promlogConfig := &promlog.Config{}
+	flag.AddFlags(kingpin.CommandLine, promlogConfig)
+	kingpin.Version(version.Print("jetson-exporter"))
+	kingpin.HelpFlag.Short('h')
+	kingpin.Parse()
+	logger := promlog.New(promlogConfig)
+
+	level.Info(logger).Log("msg", "Starting jetson-exporter")
 
 	go func() {
 		cmd := exec.Command("tegrastats")
@@ -135,21 +153,19 @@ func main() {
 		}
 	}()
 
-	http.Handle("/metrics", promhttp.Handler())
+	http.Handle(*metricsPath, promhttp.Handler())
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(`<html>
              <head><title>Jetson Exporter</title></head>
              <body>
              <h1>Jetson Exporter</h1>
-             <p><a href='/metrics'>Metrics</a></p>
-             </body>
+             <p><a href='` + *metricsPath + `'>Metrics</a></p>
+			 </body>
              </html>`))
 	})
 
-	addr := ":9012"
-	level.Info(logger).Log("HTTP server listening on %s", addr)
-
-	if err := http.ListenAndServe(addr, nil); err != nil {
+	srv := &http.Server{}
+	if err := web.ListenAndServe(srv, webConfig, logger); err != nil {
 		level.Error(logger).Log("msg", "Error starting HTTP server", "err", err)
 		os.Exit(1)
 	}
