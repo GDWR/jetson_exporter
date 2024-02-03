@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"regexp"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -153,5 +154,16 @@ func ParseTegraStats(input string) (*TegraStats, error) {
 
 func ParseTegraStatsCpus(input string) []TegraCpu {
 	output := make([]TegraCpu, 0)
+
+	rawCpus := strings.Split(input, ",")
+	for i, rawCpu := range rawCpus {
+		cpu := strings.Split(rawCpu, "@")
+		percentage, _ := strconv.ParseFloat(strings.TrimSuffix(cpu[0], "%"), 64)
+		output = append(output, TegraCpu{
+			Core:       strconv.Itoa(i),
+			Percentage: percentage,
+		})
+	}
+
 	return output
 }

@@ -13,81 +13,40 @@ import (
 	"github.com/gdwr/jetson_exporter/pkg/tegrastats"
 	"github.com/go-kit/log/level"
 	"github.com/prometheus/client_golang/prometheus"
-	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/prometheus/common/promlog"
 	webflag "github.com/prometheus/exporter-toolkit/web/kingpinflag"
 )
 
 var (
-	ramUsageMegabytes = promauto.NewGauge(prometheus.GaugeOpts{
-		Name: "tegrastats_ram_usage_megabytes",
-		Help: "The current RAM usage in megabytes",
-	})
-	ramMaxMegabytes = promauto.NewGauge(prometheus.GaugeOpts{
-		Name: "tegrastats_ram_max_megabytes",
-		Help: "The maximum RAM in megabytes",
-	})
-	swapUsageMegabytes = promauto.NewGauge(prometheus.GaugeOpts{
-		Name: "tegrastats_swap_usage_megabytes",
-		Help: "The current SWAP usage in megabytes",
-	})
-	swapMaxMegabytes = promauto.NewGauge(prometheus.GaugeOpts{
-		Name: "tegrastats_swap_max_megabytes",
-		Help: "The maximum SWAP in megabytes",
-	})
-	swapCachedMegabytes = promauto.NewGauge(prometheus.GaugeOpts{
-		Name: "tegrastats_swap_cached_megabytes",
-		Help: "The current SWAP cached in megabytes",
-	})
-	emcFreqPercent = promauto.NewGauge(prometheus.GaugeOpts{
-		Name: "tegrastats_emc_freq_percent",
-		Help: "The current EMC frequency in percent",
-	})
-	gr3dFreqPercent = promauto.NewGauge(prometheus.GaugeOpts{
-		Name: "tegrastats_gr3d_freq_percent",
-		Help: "The current GR3D frequency in percent",
-	})
-	cpuTempCelsius = promauto.NewGauge(prometheus.GaugeOpts{
-		Name: "tegrastats_cpu_temp_celsius",
-		Help: "The current temperature of the CPU in celsius",
-	})
-	tboardTempCelsius = promauto.NewGauge(prometheus.GaugeOpts{
-		Name: "tegrastats_tboard_temp_celsius",
-		Help: "The current temperature of the T(egra)Board in celsius",
-	})
-	soc2TempCelsius = promauto.NewGauge(prometheus.GaugeOpts{
-		Name: "tegrastats_soc2_temp_celsius",
-		Help: "The current temperature of the SOC2 in celsius",
-	})
-	diodeTempCelsius = promauto.NewGauge(prometheus.GaugeOpts{
-		Name: "tegrastats_diode_temp_celsius",
-		Help: "The current temperature of the diode in celsius",
-	})
-	soc0TempCelsius = promauto.NewGauge(prometheus.GaugeOpts{
-		Name: "tegrastats_soc0_temp_celsius",
-		Help: "The current temperature of the SOC0 in celsius",
-	})
-	cv1TempCelsius = promauto.NewGauge(prometheus.GaugeOpts{
-		Name: "tegrastats_cv1_temp_celsius",
-		Help: "The current temperature of the CV1 in celsius",
-	})
-	gpuTempCelsius = promauto.NewGauge(prometheus.GaugeOpts{
-		Name: "tegrastats_gpu_temp_celsius",
-		Help: "The current temperature of the GPU in celsius",
-	})
-	tjTempCelsius = promauto.NewGauge(prometheus.GaugeOpts{
-		Name: "tegrastats_tj_temp_celsius",
-		Help: "The current temperature of the TJ in celsius",
-	})
-	soc1TempCelsius = promauto.NewGauge(prometheus.GaugeOpts{
-		Name: "tegrastats_soc1_temp_celsius",
-		Help: "The current temperature of the SOC1 in celsius",
-	})
-	cv2TempCelsius = promauto.NewGauge(prometheus.GaugeOpts{
-		Name: "tegrastats_cv2_temp_celsius",
-		Help: "The current temperature of the CV2 in celsius",
-	})
+	tegrastatsTemperature = prometheus.NewGaugeVec(
+		prometheus.GaugeOpts{
+			Name: "tegrastats_temperature_celsius",
+			Help: "temperature in celsius gathered from tegrastats",
+		},
+		[]string{"component"},
+	)
+	tegrastatsRam = prometheus.NewGaugeVec(
+		prometheus.GaugeOpts{
+			Name: "tegrastats_ram_megabytes",
+			Help: "ram metrics in megabytes gathered from tegrastats",
+		},
+		[]string{"type"},
+	)
+	tegrastatsSwap = prometheus.NewGaugeVec(
+		prometheus.GaugeOpts{
+			Name: "tegrastats_swap_megabytes",
+			Help: "swap metrics in megabytes gathered from tegrastats",
+		},
+		[]string{"type"},
+	)
+	tegrastatsCpu = prometheus.NewGaugeVec(
+		prometheus.GaugeOpts{
+			Name: "tegrastats_cpu_percentage",
+			Help: "cpu metrics in percentage gathered from tegrastats",
+		},
+		[]string{"core"},
+	)
 )
 
 func main() {
@@ -103,6 +62,11 @@ func main() {
 	kingpin.HelpFlag.Short('h')
 	kingpin.Parse()
 	logger := promlog.New(promlogConfig)
+
+	prometheus.Register(tegrastatsTemperature)
+	prometheus.Register(tegrastatsRam)
+	prometheus.Register(tegrastatsSwap)
+	prometheus.Register(tegrastatsCpu)
 
 	level.Info(logger).Log("msg", "Starting jetson-exporter", "tegraPath", *tegrastatsPath)
 
@@ -133,23 +97,28 @@ func main() {
 				continue
 			}
 			level.Debug(logger).Log("message", "updating metrics")
-			ramUsageMegabytes.Set(float64(stats.Ram))
-			ramMaxMegabytes.Set(float64(stats.RamMax))
-			swapUsageMegabytes.Set(float64(stats.Swap))
-			swapMaxMegabytes.Set(float64(stats.SwapMax))
-			swapCachedMegabytes.Set(float64(stats.SwapCached))
-			emcFreqPercent.Set(float64(stats.EMCFreq))
-			gr3dFreqPercent.Set(float64(stats.GR3DFreq))
-			cpuTempCelsius.Set(stats.CpuTemp)
-			tboardTempCelsius.Set(stats.TBoardTemp)
-			soc2TempCelsius.Set(stats.SOC2Temp)
-			diodeTempCelsius.Set(stats.DiodeTemp)
-			soc0TempCelsius.Set(stats.SOC0Temp)
-			cv1TempCelsius.Set(stats.CV1Temp)
-			gpuTempCelsius.Set(stats.GpuTemp)
-			tjTempCelsius.Set(stats.TjTemp)
-			soc1TempCelsius.Set(stats.Soc1Temp)
-			cv2TempCelsius.Set(stats.CV2Temp)
+
+			tegrastatsTemperature.WithLabelValues("cpu").Set(stats.CpuTemp)
+			tegrastatsTemperature.WithLabelValues("gpu").Set(stats.GpuTemp)
+			tegrastatsTemperature.WithLabelValues("tboard").Set(stats.TBoardTemp)
+			tegrastatsTemperature.WithLabelValues("diode").Set(stats.DiodeTemp)
+			tegrastatsTemperature.WithLabelValues("tj").Set(stats.TjTemp)
+			tegrastatsTemperature.WithLabelValues("soc0").Set(stats.SOC0Temp)
+			tegrastatsTemperature.WithLabelValues("soc1").Set(stats.Soc1Temp)
+			tegrastatsTemperature.WithLabelValues("soc2").Set(stats.SOC2Temp)
+			tegrastatsTemperature.WithLabelValues("cv1").Set(stats.CV1Temp)
+			tegrastatsTemperature.WithLabelValues("cv2").Set(stats.CV2Temp)
+
+			tegrastatsRam.WithLabelValues("usage").Set(float64(stats.Ram))
+			tegrastatsRam.WithLabelValues("max").Set(float64(stats.RamMax))
+
+			tegrastatsSwap.WithLabelValues("current").Set(float64(stats.Swap))
+			tegrastatsSwap.WithLabelValues("cached").Set(float64(stats.SwapCached))
+			tegrastatsSwap.WithLabelValues("max").Set(float64(stats.SwapMax))
+
+			for _, cpu := range stats.Cpus {
+				tegrastatsCpu.WithLabelValues(cpu.Core).Set(cpu.Percentage)
+			}
 		}
 	}()
 

@@ -32,11 +32,10 @@ func (ts TegraStats) String() string {
 }
 
 type TegraCpu struct {
-	X int
-	Y int
-	Z int
+	Core       string
+	Percentage float64
 }
 
 func (tc TegraCpu) String() string {
-	return fmt.Sprintf("%v%%@%v", tc.X, tc.Z)
+	return fmt.Sprintf("%v@%v%%", tc.Core, tc.Percentage)
 }

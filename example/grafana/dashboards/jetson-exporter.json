@@ -18,8 +18,20 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 1,
-  "links": [],
+  "links": [
+    {
+      "asDropdown": false,
+      "icon": "external link",
+      "includeVars": false,
+      "keepTime": false,
+      "tags": [],
+      "targetBlank": false,
+      "title": "Jetson Exporter",
+      "tooltip": "",
+      "type": "link",
+      "url": "https://github.com/GDWR/jetson-exporter"
+    }
+  ],
   "liveNow": false,
   "panels": [
     {
@@ -30,8 +42,7 @@
       "fieldConfig": {
         "defaults": {
           "color": {
-            "fixedColor": "green",
-            "mode": "fixed"
+            "mode": "continuous-GrYlRd"
           },
           "mappings": [],
           "thresholds": {
@@ -47,23 +58,25 @@
               }
             ]
           },
-          "unit": "decmbytes",
+          "unit": "percent",
           "unitScale": true
         },
         "overrides": []
       },
       "gridPos": {
-        "h": 5,
+        "h": 11,
         "w": 4,
         "x": 0,
         "y": 0
       },
-      "id": 2,
+      "id": 6,
       "options": {
-        "colorMode": "background",
-        "graphMode": "none",
-        "justifyMode": "auto",
-        "orientation": "auto",
+        "displayMode": "lcd",
+        "maxVizHeight": 300,
+        "minVizHeight": 16,
+        "minVizWidth": 8,
+        "namePlacement": "auto",
+        "orientation": "horizontal",
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
@@ -71,9 +84,9 @@
           "fields": "",
           "values": false
         },
-        "showPercentChange": false,
-        "textMode": "auto",
-        "wideLayout": true
+        "showUnfilled": true,
+        "sizing": "auto",
+        "valueMode": "color"
       },
       "pluginVersion": "10.3.1",
       "targets": [
@@ -84,37 +97,22 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "tegrastats_ram_usage_megabytes{instance=\"$instance\"}",
-          "fullMetaSearch": false,
-          "hide": true,
-          "includeNullMetadata": true,
-          "instant": false,
-          "legendFormat": "Usage",
-          "range": true,
-          "refId": "Ram Usage",
-          "useBackend": false
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "disableTextWrap": false,
-          "editorMode": "builder",
-          "expr": "tegrastats_ram_max_megabytes{instance=\"$instance\"}",
+          "exemplar": false,
+          "expr": "sort_desc(sort(tegrastats_cpu_percentage{instance=\"$instance\"}))",
           "fullMetaSearch": false,
           "hide": false,
           "includeNullMetadata": true,
           "instant": false,
-          "legendFormat": "Max",
+          "legendFormat": "{{core}}",
           "range": true,
-          "refId": "Ram Max",
+          "refId": "A",
           "useBackend": false
         }
       ],
-      "title": "Available RAM",
+      "title": "CPU Usage per core",
+      "transformations": [],
       "transparent": true,
-      "type": "stat"
+      "type": "bargauge"
     },
     {
       "datasource": {
@@ -123,13 +121,134 @@
       },
       "fieldConfig": {
         "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 78,
+            "gradientMode": "opacity",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineStyle": {
+              "fill": "solid"
+            },
+            "lineWidth": 2,
+            "pointSize": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "normal"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
           "mappings": [],
           "thresholds": {
-            "mode": "percentage",
+            "mode": "absolute",
             "steps": [
               {
                 "color": "green",
                 "value": null
+              }
+            ]
+          },
+          "unit": "percent",
+          "unitScale": false
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 11,
+        "w": 10,
+        "x": 4,
+        "y": 0
+      },
+      "id": 7,
+      "options": {
+        "legend": {
+          "calcs": [
+            "mean"
+          ],
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "10.3.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "disableTextWrap": false,
+          "editorMode": "builder",
+          "exemplar": false,
+          "expr": "sort_desc(sort(tegrastats_cpu_percentage{instance=\"$instance\"}))",
+          "fullMetaSearch": false,
+          "hide": false,
+          "includeNullMetadata": true,
+          "instant": false,
+          "legendFormat": "{{core}}",
+          "range": true,
+          "refId": "A",
+          "useBackend": false
+        }
+      ],
+      "title": "CPU Usage Total",
+      "transformations": [],
+      "transparent": true,
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            {
+              "options": {
+                "-256": {
+                  "index": 0,
+                  "text": "N/a"
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 50
               },
               {
                 "color": "orange",
@@ -137,22 +256,22 @@
               },
               {
                 "color": "red",
-                "value": 85
+                "value": 80
               }
             ]
           },
-          "unit": "percent",
+          "unit": "celsius",
           "unitScale": true
         },
         "overrides": []
       },
       "gridPos": {
-        "h": 5,
-        "w": 6,
-        "x": 4,
+        "h": 8,
+        "w": 10,
+        "x": 14,
         "y": 0
       },
-      "id": 5,
+      "id": 3,
       "options": {
         "minVizHeight": 75,
         "minVizWidth": 75,
@@ -177,35 +296,18 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "tegrastats_emc_freq_percent{instance=\"$instance\"}",
+          "expr": "tegrastats_temperature_celsius{instance=\"$instance\"}",
           "fullMetaSearch": false,
           "hide": false,
           "includeNullMetadata": true,
           "instant": false,
-          "legendFormat": "emc",
-          "range": true,
-          "refId": "Tboard",
-          "useBackend": false
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "disableTextWrap": false,
-          "editorMode": "builder",
-          "expr": "tegrastats_gr3d_freq_percent{instance=\"$instance\"}",
-          "fullMetaSearch": false,
-          "hide": false,
-          "includeNullMetadata": true,
-          "instant": false,
-          "legendFormat": "gr3d",
+          "legendFormat": "{{component}}",
           "range": true,
           "refId": "A",
           "useBackend": false
         }
       ],
-      "title": "Usage",
+      "title": "Temperature",
       "transparent": true,
       "type": "gauge"
     },
@@ -239,8 +341,7 @@
             "lineWidth": 1,
             "pointSize": 5,
             "scaleDistribution": {
-              "log": 2,
-              "type": "log"
+              "type": "linear"
             },
             "showPoints": "auto",
             "spanNulls": false,
@@ -265,13 +366,38 @@
           "unit": "decmbytes",
           "unitScale": true
         },
-        "overrides": []
+        "overrides": [
+          {
+            "__systemRef": "hideSeriesFrom",
+            "matcher": {
+              "id": "byNames",
+              "options": {
+                "mode": "exclude",
+                "names": [
+                  "ram"
+                ],
+                "prefix": "All except:",
+                "readOnly": true
+              }
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": true
+                }
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
-        "h": 5,
-        "w": 11,
-        "x": 10,
-        "y": 0
+        "h": 6,
+        "w": 10,
+        "x": 14,
+        "y": 8
       },
       "id": 4,
       "options": {
@@ -298,35 +424,18 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "tegrastats_swap_usage_megabytes{instance=\"$instance\"}",
+          "expr": "tegrastats_ram_megabytes{instance=\"$instance\"}",
           "fullMetaSearch": false,
           "hide": false,
           "includeNullMetadata": true,
           "instant": false,
-          "legendFormat": "Usage",
-          "range": true,
-          "refId": "Tboard",
-          "useBackend": false
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "disableTextWrap": false,
-          "editorMode": "builder",
-          "expr": "tegrastats_swap_cached_megabytes{instance=\"$instance\"}",
-          "fullMetaSearch": false,
-          "hide": false,
-          "includeNullMetadata": true,
-          "instant": false,
-          "legendFormat": "Cached",
+          "legendFormat": "{{type}}",
           "range": true,
           "refId": "A",
           "useBackend": false
         }
       ],
-      "title": "Swap",
+      "title": "RAM",
       "transparent": true,
       "type": "timeseries"
     },
@@ -360,264 +469,7 @@
             "lineWidth": 1,
             "pointSize": 5,
             "scaleDistribution": {
-              "log": 2,
-              "type": "log"
-            },
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "dashed"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "percentage",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              }
-            ]
-          },
-          "unit": "celsius",
-          "unitScale": true
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 21,
-        "x": 0,
-        "y": 5
-      },
-      "id": 3,
-      "options": {
-        "legend": {
-          "calcs": [
-            "max",
-            "stdDev",
-            "mean"
-          ],
-          "displayMode": "table",
-          "placement": "right",
-          "showLegend": true
-        },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "disableTextWrap": false,
-          "editorMode": "builder",
-          "expr": "tegrastats_cpu_temp_celsius{instance=\"$instance\"}",
-          "fullMetaSearch": false,
-          "includeNullMetadata": true,
-          "instant": false,
-          "legendFormat": "Cpu",
-          "range": true,
-          "refId": "Cpu",
-          "useBackend": false
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "disableTextWrap": false,
-          "editorMode": "builder",
-          "expr": "tegrastats_cv1_temp_celsius{instance=\"$instance\"}",
-          "fullMetaSearch": false,
-          "hide": true,
-          "includeNullMetadata": true,
-          "instant": false,
-          "legendFormat": "Cv1",
-          "range": true,
-          "refId": "Cv1",
-          "useBackend": false
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "disableTextWrap": false,
-          "editorMode": "builder",
-          "expr": "tegrastats_cv2_temp_celsius{instance=\"$instance\"}",
-          "fullMetaSearch": false,
-          "hide": true,
-          "includeNullMetadata": true,
-          "instant": false,
-          "legendFormat": "Cv2",
-          "range": true,
-          "refId": "Cv2",
-          "useBackend": false
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "disableTextWrap": false,
-          "editorMode": "builder",
-          "expr": "tegrastats_diode_temp_celsius{instance=\"$instance\"}",
-          "fullMetaSearch": false,
-          "hide": false,
-          "includeNullMetadata": true,
-          "instant": false,
-          "legendFormat": "Diode",
-          "range": true,
-          "refId": "Diode",
-          "useBackend": false
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "disableTextWrap": false,
-          "editorMode": "builder",
-          "expr": "tegrastats_gpu_temp_celsius{instance=\"$instance\"}",
-          "fullMetaSearch": false,
-          "hide": true,
-          "includeNullMetadata": true,
-          "instant": false,
-          "legendFormat": "Gpu",
-          "range": true,
-          "refId": "Gpu",
-          "useBackend": false
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "disableTextWrap": false,
-          "editorMode": "builder",
-          "expr": "tegrastats_soc0_temp_celsius{instance=\"$instance\"}",
-          "fullMetaSearch": false,
-          "hide": false,
-          "includeNullMetadata": true,
-          "instant": false,
-          "legendFormat": "Soc0",
-          "range": true,
-          "refId": "Soc0",
-          "useBackend": false
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "disableTextWrap": false,
-          "editorMode": "builder",
-          "expr": "tegrastats_soc1_temp_celsius{instance=\"$instance\"}",
-          "fullMetaSearch": false,
-          "hide": false,
-          "includeNullMetadata": true,
-          "instant": false,
-          "legendFormat": "Soc1",
-          "range": true,
-          "refId": "Soc1",
-          "useBackend": false
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "disableTextWrap": false,
-          "editorMode": "builder",
-          "expr": "tegrastats_soc2_temp_celsius{instance=\"$instance\"}",
-          "fullMetaSearch": false,
-          "hide": false,
-          "includeNullMetadata": true,
-          "instant": false,
-          "legendFormat": "Soc2",
-          "range": true,
-          "refId": "Soc2",
-          "useBackend": false
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "disableTextWrap": false,
-          "editorMode": "builder",
-          "expr": "tegrastats_tboard_temp_celsius{instance=\"$instance\"}",
-          "fullMetaSearch": false,
-          "hide": false,
-          "includeNullMetadata": true,
-          "instant": false,
-          "legendFormat": "Tboard",
-          "range": true,
-          "refId": "Tboard",
-          "useBackend": false
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "disableTextWrap": false,
-          "editorMode": "builder",
-          "expr": "tegrastats_tj_temp_celsius{instance=\"$instance\"}",
-          "fullMetaSearch": false,
-          "hide": false,
-          "includeNullMetadata": true,
-          "instant": false,
-          "legendFormat": "Tj",
-          "range": true,
-          "refId": "A",
-          "useBackend": false
-        }
-      ],
-      "title": "Temperature",
-      "transparent": true,
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "continuous-GrYlRd"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 6,
-            "gradientMode": "opacity",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "smooth",
-            "lineWidth": 2,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "log": 2,
-              "type": "log"
+              "type": "linear"
             },
             "showPoints": "auto",
             "spanNulls": false,
@@ -642,15 +494,41 @@
           "unit": "decmbytes",
           "unitScale": true
         },
-        "overrides": []
+        "overrides": [
+          {
+            "__systemRef": "hideSeriesFrom",
+            "matcher": {
+              "id": "byNames",
+              "options": {
+                "mode": "exclude",
+                "names": [
+                  "swap",
+                  "swap_cached"
+                ],
+                "prefix": "All except:",
+                "readOnly": true
+              }
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": true
+                }
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
-        "h": 8,
-        "w": 21,
-        "x": 0,
-        "y": 13
+        "h": 6,
+        "w": 10,
+        "x": 14,
+        "y": 14
       },
-      "id": 1,
+      "id": 5,
       "options": {
         "legend": {
           "calcs": [
@@ -675,46 +553,30 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "tegrastats_ram_usage_megabytes{instance=\"$instance\"}",
+          "expr": "tegrastats_swap_megabytes{instance=\"$instance\"}",
           "fullMetaSearch": false,
+          "hide": false,
           "includeNullMetadata": true,
           "instant": false,
-          "legendFormat": "Usage",
+          "legendFormat": "{{type}}",
           "range": true,
-          "refId": "Ram Usage",
-          "useBackend": false
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "disableTextWrap": false,
-          "editorMode": "builder",
-          "expr": "tegrastats_ram_max_megabytes{instance=\"$instance\"}",
-          "fullMetaSearch": false,
-          "hide": true,
-          "includeNullMetadata": true,
-          "instant": false,
-          "legendFormat": "Max",
-          "range": true,
-          "refId": "Ram Max",
+          "refId": "A",
           "useBackend": false
         }
       ],
-      "title": "RAM Usage",
+      "title": "Swap",
       "transparent": true,
       "type": "timeseries"
     }
   ],
-  "refresh": "",
+  "refresh": "5s",
   "schemaVersion": 39,
   "tags": [],
   "templating": {
     "list": [
       {
         "current": {
-          "selected": true,
+          "selected": false,
           "text": "127.0.0.1:9102",
           "value": "127.0.0.1:9102"
         },
@@ -749,6 +611,6 @@
   "timezone": "",
   "title": "Jetson Exporter",
   "uid": "d3572e85-6cf6-4efc-b267-c3709d0f2f2a",
-  "version": 3,
+  "version": 4,
   "weekStart": ""
 }
