@@ -1,4 +1,4 @@
-module jetsonexporter
+module jetson_exporter
 
 go 1.21
 

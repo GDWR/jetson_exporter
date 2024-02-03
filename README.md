@@ -22,11 +22,11 @@ Supported devices:
 
 ```shell
 # Download the latest release
-wget https://github.com/GDWR/jetson-exporter/releases/download/v0.0.1/jetsonexporter_0.0.1_arm64.deb
+wget https://github.com/GDWR/jetson-exporter/releases/download/v0.0.1/jetson-exporter_0.0.1_arm64.deb
 # Install the package
-sudo dpkg -i jetsonexporter_0.0.1_arm64.deb
+sudo dpkg -i jetson-exporter_0.0.1_arm64.deb
 # Clean up
-rm jetsonexporter_0.0.1_arm64.deb
+rm jetson-exporter_0.0.1_arm64.deb
 ```
 
 

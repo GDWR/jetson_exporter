@@ -1,4 +1,4 @@
-Package: jetsonexporter
+Package: jetson-exporter
 Priority: optional
 Maintainer: GDWR <gregory.dwr@gmail.com>
 Version: 0.1.0

@@ -2,7 +2,7 @@
 Description=A prometheus exporter for the Nvidia Jetson family
 
 [Service]
-ExecStart=/usr/bin/env jetsonexporter
+ExecStart=/usr/bin/env jetson-exporter
 Restart=always
 
 [Install]

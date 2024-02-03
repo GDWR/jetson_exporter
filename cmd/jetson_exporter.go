@@ -7,7 +7,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/prometheus/common/promlog"
-	"jetsonexporter/pkg/tegrastats"
+	"jetson_exporter/pkg/tegrastats"
 	"net/http"
 	"os"
 	"os/exec"
