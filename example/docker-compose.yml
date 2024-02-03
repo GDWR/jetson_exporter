@@ -1,0 +1,18 @@
+# This configuration assumes that it is running on the same Jetson host. If you wish to have this on an external server
+#   Update `prometheus.yml` to have the correct target hostname.
+
+services:
+  prometheus:
+    image: prom/prometheus
+    network_mode: host
+    command:
+      - --config.file=/etc/prometheus.yml
+    volumes:
+      - ./prometheus.yml:/etc/prometheus.yml
+
+  grafana:
+    image: grafana/grafana
+    network_mode: host
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./grafana/dashboards:/var/lib/grafana/dashboards

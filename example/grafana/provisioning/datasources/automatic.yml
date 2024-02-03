@@ -1,0 +1,10 @@
+apiVersion: 1
+
+datasources:
+- name: Prometheus
+  uid: prometheus
+  type: prometheus
+  url: http://localhost:9090
+  editable: false
+  jsonData:
+    httpMethod: GET

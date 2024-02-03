@@ -1,0 +1,7 @@
+apiVersion: 1
+
+providers:
+- name: 'automatic'
+  disableDeletion: true
+  options:
+    path: /var/lib/grafana/dashboards
