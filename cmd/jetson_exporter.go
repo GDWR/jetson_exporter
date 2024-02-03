@@ -2,15 +2,16 @@ package main
 
 import (
 	"bufio"
+	"net/http"
+	"os"
+	"os/exec"
+
+	"github.com/gdwr/jetson_exporter/pkg/tegrastats"
 	"github.com/go-kit/log/level"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/prometheus/common/promlog"
-	"jetson_exporter/pkg/tegrastats"
-	"net/http"
-	"os"
-	"os/exec"
 )
 
 var (

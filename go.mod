@@ -1,4 +1,4 @@
-module jetson_exporter
+module github.com/gdwr/jetson_exporter
 
 go 1.21
 
