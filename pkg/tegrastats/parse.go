@@ -21,12 +21,12 @@ var regex = regexp.MustCompile(
 		`CPU@(?P<cpuTemp>[\d|\.]+)C ` +
 		`Tboard@(?P<tboardTemp>[\d|\.]+)C ` +
 		`SOC2@(?P<soc2Temp>[\d|\.]+)C ` +
-		`Tdiode@(?P<diodeTemp>[\d|\.]+)C ` +
-		`SOC0@(?P<soc0Temp>[\d|\.]+)C ` +
+		`Tdiode@(?P<diodeTemp>[\-|\d|\.]+)C ` +
+		`SOC0@(?P<soc0Temp>[\-|\d|\.]+)C ` +
 		`CV1@(?P<cv1Temp>[\-|\d|\.]+)C ` +
-		`GPU@(?P<gpuTemp>[\d|\.]+)C ` +
-		`tj@(?P<tjTemp>[\d|\.]+)C ` +
-		`SOC1@(?P<soc1Temp>[\d|\.]+)C ` +
+		`GPU@(?P<gpuTemp>[\-|\d|\.]+)C ` +
+		`tj@(?P<tjTemp>[\-|\d|\.]+)C ` +
+		`SOC1@(?P<soc1Temp>[\-|\d|\.]+)C ` +
 		`CV2@(?P<cv2Temp>[\-|\d|\.]+)C`,
 )
 
