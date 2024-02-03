@@ -1,6 +1,10 @@
 Jetson Exporter
 ===============
 
+<div align="flex">
+    <img align="right" src="./assets/elroy_jetson.webp" width="40%" alt="Elroy Jetson">
+</div>
+
 [![Go Report Card](https://goreportcard.com/badge/github.com/GDWR/jetson-exporter)](https://goreportcard.com/report/github.com/GDWR/jetson-exporter)
 [![Go Reference](https://pkg.go.dev/badge/github.com/GDWR/jetson-exporter.svg)](https://pkg.go.dev/github.com/GDWR/jetson-exporter)
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/GDWR/jetson-exporter)](https://github.com/GDWR/jetson_exporter/releases)
