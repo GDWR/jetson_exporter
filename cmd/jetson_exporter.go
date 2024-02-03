@@ -91,10 +91,10 @@ var (
 )
 
 func main() {
-
 	var (
-		webConfig   = webflag.AddFlags(kingpin.CommandLine, ":9102")
-		metricsPath = kingpin.Flag("web.telemetry-path", "Path under which to expose metrics.").Default("/metrics").String()
+		webConfig      = webflag.AddFlags(kingpin.CommandLine, ":9102")
+		metricsPath    = kingpin.Flag("web.telemetry-path", "Path under which to expose metrics.").Default("/metrics").String()
+		tegrastatsPath = kingpin.Flag("tegrastats.path", "Path to tegrastats binary, if not provided will attempt to use $PATH").Default("tegrastats").String()
 	)
 
 	promlogConfig := &promlog.Config{}
@@ -104,10 +104,10 @@ func main() {
 	kingpin.Parse()
 	logger := promlog.New(promlogConfig)
 
-	level.Info(logger).Log("msg", "Starting jetson-exporter")
+	level.Info(logger).Log("msg", "Starting jetson-exporter", "tegraPath", *tegrastatsPath)
 
 	go func() {
-		cmd := exec.Command("tegrastats")
+		cmd := exec.Command(*tegrastatsPath)
 
 		stdout, err := cmd.StdoutPipe()
 		if err != nil {
