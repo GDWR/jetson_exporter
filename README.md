@@ -6,7 +6,6 @@ Jetson Exporter
 </div>
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/GDWR/jetson-exporter)](https://goreportcard.com/report/github.com/GDWR/jetson-exporter)
-[![Go Reference](https://pkg.go.dev/badge/github.com/GDWR/jetson-exporter.svg)](https://pkg.go.dev/github.com/GDWR/jetson-exporter)
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/GDWR/jetson-exporter)](https://github.com/GDWR/jetson_exporter/releases)
 [![GitHub](https://img.shields.io/github/license/GDWR/jetson-exporter)](https://github.com/GDWR/jetson_exporter/blob/main/LICENSE)
 
