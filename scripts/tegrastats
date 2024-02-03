@@ -134,6 +134,8 @@ main()
         IS_SUDO=true
     fi
 
+    JETSON_MODEL="Orin"
+    
     while true; do
         # Print output tegrastats
         if $IS_SUDO ; then
