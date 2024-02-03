@@ -53,5 +53,6 @@ Resources
 ---------
 * [`tegrastats` Utility](https://docs.nvidia.com/drive/drive-os-5.2.0.0L/drive-os/index.html#page/DRIVE_OS_Linux_SDK_Development_Guide/Utilities/util_tegrastats.html)
 * [jetson_stats](https://github.com/rbonghi/jetson_stats)
+  * [jetson-stats-grafana-dashboard](https://github.com/svcavallar/jetson-stats-grafana-dashboard/tree/master)
 * [ridgerun's Evaluating Performance docs using `tegrastats`](https://developer.ridgerun.com/wiki/index.php/Xavier/JetPack_5.0.2/Performance_Tuning/Evaluating_Performance)
 * [Repository Structure](https://github.com/golang-standards/project-layout)
