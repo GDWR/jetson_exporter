@@ -1,7 +1,6 @@
 package tegrastats
 
 import (
-	"fmt"
 	"regexp"
 	"strconv"
 	"strings"
@@ -9,39 +8,35 @@ import (
 )
 
 // https://docs.nvidia.com/drive/drive_os_5.1.6.1L/nvvib_docs/index.html#page/DRIVE_OS_Linux_SDK_Development_Guide/Utilities/util_tegrastats.html
-var regex = regexp.MustCompile(
-	`(?P<time>\d+-\d+-\d+\s\d+:\d+:\d+) ` +
-		`RAM (?P<ram>\d+)/(?P<ramMax>\d+)MB ` +
-		`\(lfb \d+x\d+MB\) ` +
-		`SWAP (?P<swap>\d+)/(?P<swapMax>\d+)MB ` +
-		`\(cached (?P<swapCached>\d+)MB\) ` +
-		`CPU \[(?P<cpus>.+)\] ` +
-		`EMC_FREQ (?P<emcFreq>\d+)% ` +
-		`GR3D_FREQ (?P<gr3dFreq>\d+)% ` +
-		`CV0@(?P<cv0Temp>[\-|\d|\.]+)C ` +
-		`CPU@(?P<cpuTemp>[\d|\.]+)C ` +
-		`Tboard@(?P<tboardTemp>[\d|\.]+)C ` +
-		`SOC2@(?P<soc2Temp>[\d|\.]+)C ` +
-		`Tdiode@(?P<diodeTemp>[\-|\d|\.]+)C ` +
-		`SOC0@(?P<soc0Temp>[\-|\d|\.]+)C ` +
-		`CV1@(?P<cv1Temp>[\-|\d|\.]+)C ` +
-		`GPU@(?P<gpuTemp>[\-|\d|\.]+)C ` +
-		`tj@(?P<tjTemp>[\-|\d|\.]+)C ` +
-		`SOC1@(?P<soc1Temp>[\-|\d|\.]+)C ` +
-		`CV2@(?P<cv2Temp>[\-|\d|\.]+)C`,
-)
+var regexes = map[string]*regexp.Regexp{
+	"time":       regexp.MustCompile(`\d+-\d+-\d+\s\d+:\d+:\d+`),
+	"ram":        regexp.MustCompile(`RAM (\d+)/\d+MB`),
+	"ramMax":     regexp.MustCompile(`RAM \d+/(\d+)MB`),
+	"swap":       regexp.MustCompile(`SWAP (\d+)/\d+MB`),
+	"swapMax":    regexp.MustCompile(`SWAP \d+/(\d)+MB`),
+	"swapCached": regexp.MustCompile(`\(cached (\d+)MB\)`),
+	"cpus":       regexp.MustCompile(`CPU \[(.+)\]`),
+	"emcFreq":    regexp.MustCompile(`EMC_FREQ (\d+)%`),
+	"gr3dFreq":   regexp.MustCompile(`GR3D_FREQ (\d+)%`),
+	"cv0Temp":    regexp.MustCompile(`CV0@(-?[\-|\d|\.]+)C`),
+	"cpuTemp":    regexp.MustCompile(`CPU@(-?[\d|\.]+)C`),
+	"tboardTemp": regexp.MustCompile(`Tboard@(-?[\d|\.]+)C`),
+	"soc2Temp":   regexp.MustCompile(`SOC2@(-?[\d|\.]+)C`),
+	"diodeTemp":  regexp.MustCompile(`Tdiode@(-?[\d|\.]+)C`),
+	"soc0Temp":   regexp.MustCompile(`SOC0@(-?[\d|\.]+)C`),
+	"cv1Temp":    regexp.MustCompile(`CV1@(-?[\d|\.]+)C`),
+	"gpuTemp":    regexp.MustCompile(`GPU@(-?[\d|\.]+)C`),
+	"tjTemp":     regexp.MustCompile(`tj@(-?[\d|\.]+)C`),
+	"soc1Temp":   regexp.MustCompile(`SOC1@(-?[\d|\.]+)C`),
+	"cv2Temp":    regexp.MustCompile(`CV2@(-?[\d|\.]+)C`),
+}
 
 func ParseTegraStats(input string) (*TegraStats, error) {
 	result := make(map[string]string)
-	match := regex.FindStringSubmatch(input)
-	for i, name := range regex.SubexpNames() {
-		if i != 0 && name != "" {
-			if len(match) == 0 {
-				return nil, fmt.Errorf("no match found for %v", name)
-			}
 
-			result[name] = match[i]
-		}
+	for k, v := range regexes {
+		matches := v.FindStringSubmatch(input)
+		result[k] = matches[len(matches)-1]
 	}
 
 	time, err := time.Parse("01-02-2006 15:04:05", result["time"])
@@ -50,76 +45,74 @@ func ParseTegraStats(input string) (*TegraStats, error) {
 	}
 
 	// parse result["ram"] and result["ramMax"] to int
-	ram, _ := strconv.Atoi(result["ram"])
+	ram, err := strconv.Atoi(result["ram"])
 	if err != nil {
 		return nil, err
 	}
-	ramMax, _ := strconv.Atoi(result["ramMax"])
+	ramMax, err := strconv.Atoi(result["ramMax"])
 	if err != nil {
 		return nil, err
 	}
-	swap, _ := strconv.Atoi(result["swap"])
+	swap, err := strconv.Atoi(result["swap"])
 	if err != nil {
 		return nil, err
 	}
-	swapMax, _ := strconv.Atoi(result["swapMax"])
+	swapMax, err := strconv.Atoi(result["swapMax"])
 	if err != nil {
 		return nil, err
 	}
-	swapCached, _ := strconv.Atoi(result["swapCached"])
+	swapCached, err := strconv.Atoi(result["swapCached"])
 	if err != nil {
 		return nil, err
 	}
 
 	cpus := ParseTegraStatsCpus(result["cpus"])
+
+	emcFreq, err := strconv.Atoi(result["emcFreq"])
 	if err != nil {
 		return nil, err
 	}
-	emcFreq, _ := strconv.Atoi(result["emcFreq"])
+	gr3dFreq, err := strconv.Atoi(result["gr3dFreq"])
 	if err != nil {
 		return nil, err
 	}
-	gr3dFreq, _ := strconv.Atoi(result["gr3dFreq"])
+	cv0Temp, err := strconv.ParseFloat(result["cv0Temp"], 64)
 	if err != nil {
 		return nil, err
 	}
-	cv0Temp, _ := strconv.ParseFloat(result["cv0Temp"], 64)
+	cpuTemp, err := strconv.ParseFloat(result["cpuTemp"], 64)
 	if err != nil {
 		return nil, err
 	}
-	cpuTemp, _ := strconv.ParseFloat(result["cpuTemp"], 64)
+	boardTemp, err := strconv.ParseFloat(result["tboardTemp"], 64)
 	if err != nil {
 		return nil, err
 	}
-	boardTemp, _ := strconv.ParseFloat(result["tboardTemp"], 64)
+	soc2Temp, err := strconv.ParseFloat(result["soc2Temp"], 64)
 	if err != nil {
 		return nil, err
 	}
-	soc2Temp, _ := strconv.ParseFloat(result["soc2Temp"], 64)
+	diodeTemp, err := strconv.ParseFloat(result["diodeTemp"], 64)
 	if err != nil {
 		return nil, err
 	}
-	diodeTemp, _ := strconv.ParseFloat(result["diodeTemp"], 64)
+	soc0Temp, err := strconv.ParseFloat(result["soc0Temp"], 64)
 	if err != nil {
 		return nil, err
 	}
-	soc0Temp, _ := strconv.ParseFloat(result["soc0Temp"], 64)
+	cv1Temp, err := strconv.ParseFloat(result["cv1Temp"], 64)
 	if err != nil {
 		return nil, err
 	}
-	cv1Temp, _ := strconv.ParseFloat(result["cv1Temp"], 64)
+	gpuTemp, err := strconv.ParseFloat(result["gpuTemp"], 64)
 	if err != nil {
 		return nil, err
 	}
-	gpuTemp, _ := strconv.ParseFloat(result["gpuTemp"], 64)
+	tjTemp, err := strconv.ParseFloat(result["tjTemp"], 64)
 	if err != nil {
 		return nil, err
 	}
-	tjTemp, _ := strconv.ParseFloat(result["tjTemp"], 64)
-	if err != nil {
-		return nil, err
-	}
-	soc1Temp, _ := strconv.ParseFloat(result["soc1Temp"], 64)
+	soc1Temp, err := strconv.ParseFloat(result["soc1Temp"], 64)
 	if err != nil {
 		return nil, err
 	}
