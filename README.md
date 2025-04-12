@@ -22,11 +22,11 @@ Supported devices:
 
 ```shell
 # Download the latest release
-wget https://github.com/GDWR/jetson_exporter/releases/download/v0.3.0/jetson-exporter_0.3.0_arm64.deb
+wget https://github.com/GDWR/jetson_exporter/releases/download/v0.3.1/jetson-exporter_0.3.1_arm64.deb
 # Install the package
-sudo dpkg -i jetson-exporter_0.3.0_arm64.deb
+sudo dpkg -i jetson-exporter_0.3.1_arm64.deb
 # Clean up
-rm jetson-exporter_0.3.0_arm64.deb
+rm jetson-exporter_0.3.1_arm64.deb
 ```
 
 ## Grafana (dashboards) + Prometheus Example
