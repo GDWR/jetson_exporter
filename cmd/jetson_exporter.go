@@ -2,13 +2,15 @@ package main
 
 import (
 	"bufio"
+	"net/http"
+	"os"
+	"os/exec"
+	"strconv"
+
 	"github.com/alecthomas/kingpin/v2"
 	"github.com/prometheus/common/promlog/flag"
 	"github.com/prometheus/common/version"
 	"github.com/prometheus/exporter-toolkit/web"
-	"net/http"
-	"os"
-	"os/exec"
 
 	"github.com/gdwr/jetson_exporter/pkg/tegrastats"
 	"github.com/go-kit/log/level"
@@ -98,26 +100,24 @@ func main() {
 			}
 			level.Debug(logger).Log("message", "updating metrics")
 
-			tegrastatsTemperature.WithLabelValues("cpu").Set(stats.CpuTemp)
-			tegrastatsTemperature.WithLabelValues("gpu").Set(stats.GpuTemp)
-			tegrastatsTemperature.WithLabelValues("tboard").Set(stats.TBoardTemp)
-			tegrastatsTemperature.WithLabelValues("diode").Set(stats.DiodeTemp)
-			tegrastatsTemperature.WithLabelValues("tj").Set(stats.TjTemp)
-			tegrastatsTemperature.WithLabelValues("soc0").Set(stats.SOC0Temp)
-			tegrastatsTemperature.WithLabelValues("soc1").Set(stats.Soc1Temp)
-			tegrastatsTemperature.WithLabelValues("soc2").Set(stats.SOC2Temp)
-			tegrastatsTemperature.WithLabelValues("cv1").Set(stats.CV1Temp)
-			tegrastatsTemperature.WithLabelValues("cv2").Set(stats.CV2Temp)
+			for _, temp := range stats.Temps {
+				tegrastatsTemperature.WithLabelValues(temp.Name).Set(float64(temp.Temp))
+			}
 
-			tegrastatsRam.WithLabelValues("usage").Set(float64(stats.Ram))
-			tegrastatsRam.WithLabelValues("max").Set(float64(stats.RamMax))
+			if stats.RAM != nil {
+				tegrastatsRam.WithLabelValues("usage").Set(float64(stats.RAM.InUse))
+				tegrastatsRam.WithLabelValues("max").Set(float64(stats.RAM.Total))
+			}
 
-			tegrastatsSwap.WithLabelValues("current").Set(float64(stats.Swap))
-			tegrastatsSwap.WithLabelValues("cached").Set(float64(stats.SwapCached))
-			tegrastatsSwap.WithLabelValues("max").Set(float64(stats.SwapMax))
+			if stats.Swap != nil {
+				tegrastatsSwap.WithLabelValues("current").Set(float64(stats.Swap.InUse))
+				tegrastatsSwap.WithLabelValues("cached").Set(float64(stats.Swap.Cached))
+				tegrastatsSwap.WithLabelValues("max").Set(float64(stats.Swap.Total))
+			}
 
-			for _, cpu := range stats.Cpus {
-				tegrastatsCpu.WithLabelValues(cpu.Core).Set(cpu.Percentage)
+			for i, cpu := range stats.CPUs {
+				iStr := strconv.Itoa(i)
+				tegrastatsCpu.WithLabelValues(iStr).Set(float64(cpu.Percentage))
 			}
 		}
 	}()
