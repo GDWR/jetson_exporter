@@ -1,7 +1,7 @@
 Package: jetson-exporter
 Priority: optional
 Maintainer: GDWR <gregory.dwr@gmail.com>
-Version: 0.2.0
+Version: 0.3.0
 Architecture: arm64
 Depends: nvidia-l4t-tools
 Description: a prometheus exporter for the Nvidia Jetson family
