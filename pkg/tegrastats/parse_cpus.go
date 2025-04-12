@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-var cpusRe = regexp.MustCompile(`CPU \[(.+)\]`)
+var cpusRe = regexp.MustCompile(`CPU \[([^\s]+)\]`)
 var cpuRe = regexp.MustCompile(`(?P<percentage>\d+)%@(?P<frequency>\d+)`)
 var errCPUsNotFound = errors.New("cpus not found")
 
@@ -17,7 +17,7 @@ func parseCPUs(input string) ([]TegraCPU, error) {
 		return nil, errCPUsNotFound
 	}
 
-	rawCpus := strings.Split(input, ",")
+	rawCpus := strings.Split(result[1], ",")
 	output := make([]TegraCPU, len(rawCpus))
 	for i, rawCpu := range rawCpus {
 		result := cpuRe.FindStringSubmatch(rawCpu)
