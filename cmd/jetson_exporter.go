@@ -23,31 +23,80 @@ import (
 var (
 	tegrastatsTemperature = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Name: "tegrastats_temperature_celsius",
-			Help: "temperature in celsius gathered from tegrastats",
+			Namespace: "tegrastats",
+			Name:      "temperature_celsius",
+			Help:      "Processor block temperature in degrees Celsius",
 		},
-		[]string{"component"},
+		[]string{"block"},
 	)
-	tegrastatsRam = prometheus.NewGaugeVec(
+
+	tegrastatsCPULoad = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Name: "tegrastats_ram_megabytes",
-			Help: "ram metrics in megabytes gathered from tegrastats",
-		},
-		[]string{"type"},
-	)
-	tegrastatsSwap = prometheus.NewGaugeVec(
-		prometheus.GaugeOpts{
-			Name: "tegrastats_swap_megabytes",
-			Help: "swap metrics in megabytes gathered from tegrastats",
-		},
-		[]string{"type"},
-	)
-	tegrastatsCpu = prometheus.NewGaugeVec(
-		prometheus.GaugeOpts{
-			Name: "tegrastats_cpu_percentage",
-			Help: "cpu metrics in percentage gathered from tegrastats",
+			Namespace: "tegrastats",
+			Name:      "cpu_load_percentage",
+			Help:      "Load on each CPU core relative to the current running frequency, or off if a core is currently powered down",
 		},
 		[]string{"core"},
+	)
+	tegrastatsCPUFrequency = prometheus.NewGaugeVec(
+		prometheus.GaugeOpts{
+			Namespace: "tegrastats",
+			Name:      "cpu_frequency_megahertz",
+			Help:      "CPU frequency in megahertz. Goes up or down dynamically depending on the CPU workload",
+		},
+		[]string{"core"},
+	)
+
+	tegrastatsRAMUsed = prometheus.NewGauge(
+		prometheus.GaugeOpts{
+			Namespace: "tegrastats",
+			Name:      "ram_used_megabytes",
+			Help:      "Amount of RAM in use, specified in megabytes",
+		},
+	)
+	tegrastatsRAMTotal = prometheus.NewGauge(
+		prometheus.GaugeOpts{
+			Namespace: "tegrastats",
+			Name:      "ram_total_megabytes",
+			Help:      "Total amount of RAM available for applications",
+		},
+	)
+
+	tegrastatsSwapInUse = prometheus.NewGauge(
+		prometheus.GaugeOpts{
+			Namespace: "tegrastats",
+			Name:      "swap_used_megabytes",
+			Help:      "Amount of SWAP in use, in megabytes",
+		},
+	)
+	tegrastatsSwapTotal = prometheus.NewGauge(
+		prometheus.GaugeOpts{
+			Namespace: "tegrastats",
+			Name:      "swap_total_megabytes",
+			Help:      "Total amount of SWAP available for applications",
+		},
+	)
+	tegrastatsSwapCached = prometheus.NewGauge(
+		prometheus.GaugeOpts{
+			Namespace: "tegrastats",
+			Name:      "swap_cached_megabytes",
+			Help:      "Amount of SWAP cached",
+		},
+	)
+
+	tegrastatsGR3DUsage = prometheus.NewGauge(
+		prometheus.GaugeOpts{
+			Namespace: "tegrastats",
+			Name:      "gr3d_usage_percentage",
+			Help:      "Percentage of the GR3D that in use, relative to the current running frequency",
+		},
+	)
+	tegrastatsGR3DFrequency = prometheus.NewGauge(
+		prometheus.GaugeOpts{
+			Namespace: "tegrastats",
+			Name:      "gr3d_frequency_megahertz",
+			Help:      "GR3D frequency in megahertz",
+		},
 	)
 )
 
@@ -66,9 +115,15 @@ func main() {
 	logger := promlog.New(promlogConfig)
 
 	prometheus.Register(tegrastatsTemperature)
-	prometheus.Register(tegrastatsRam)
-	prometheus.Register(tegrastatsSwap)
-	prometheus.Register(tegrastatsCpu)
+	prometheus.Register(tegrastatsCPULoad)
+	prometheus.Register(tegrastatsCPUFrequency)
+	prometheus.Register(tegrastatsRAMUsed)
+	prometheus.Register(tegrastatsRAMTotal)
+	prometheus.Register(tegrastatsSwapInUse)
+	prometheus.Register(tegrastatsSwapTotal)
+	prometheus.Register(tegrastatsSwapCached)
+	prometheus.Register(tegrastatsGR3DUsage)
+	prometheus.Register(tegrastatsGR3DFrequency)
 
 	level.Info(logger).Log("msg", "Starting jetson-exporter", "tegraPath", *tegrastatsPath)
 
@@ -105,19 +160,25 @@ func main() {
 			}
 
 			if stats.RAM != nil {
-				tegrastatsRam.WithLabelValues("usage").Set(float64(stats.RAM.InUse))
-				tegrastatsRam.WithLabelValues("max").Set(float64(stats.RAM.Total))
+				tegrastatsRAMUsed.Set(float64(stats.RAM.InUse))
+				tegrastatsRAMTotal.Set(float64(stats.RAM.Total))
 			}
 
 			if stats.Swap != nil {
-				tegrastatsSwap.WithLabelValues("current").Set(float64(stats.Swap.InUse))
-				tegrastatsSwap.WithLabelValues("cached").Set(float64(stats.Swap.Cached))
-				tegrastatsSwap.WithLabelValues("max").Set(float64(stats.Swap.Total))
+				tegrastatsSwapInUse.Set(float64(stats.Swap.InUse))
+				tegrastatsSwapTotal.Set(float64(stats.Swap.Total))
+				tegrastatsSwapCached.Set(float64(stats.Swap.Cached))
+			}
+
+			if stats.GR3D != nil {
+				tegrastatsGR3DUsage.Set(float64(stats.GR3D.Percentage))
+				tegrastatsGR3DFrequency.Set(float64(stats.GR3D.Frequency))
 			}
 
 			for i, cpu := range stats.CPUs {
 				iStr := strconv.Itoa(i)
-				tegrastatsCpu.WithLabelValues(iStr).Set(float64(cpu.Percentage))
+				tegrastatsCPULoad.WithLabelValues(iStr).Set(float64(cpu.Percentage))
+				tegrastatsCPUFrequency.WithLabelValues(iStr).Set(float64(cpu.Frequency))
 			}
 		}
 	}()
