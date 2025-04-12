@@ -12,5 +12,6 @@ func TestParseGR3D(t *testing.T) {
 		{"GR3D_FREQ 23%@140", TegraGR3D{Percentage: 23, Frequency: 140}},
 		{"GR3D_FREQ 0%@1377", TegraGR3D{Percentage: 0, Frequency: 1377}},
 		{"GR3D_FREQ 60%@0", TegraGR3D{Percentage: 60, Frequency: 0}},
+		{"GR3D_FREQ 0%@[1377]", TegraGR3D{Percentage: 0, Frequency: 1377}},
 	})
 }
