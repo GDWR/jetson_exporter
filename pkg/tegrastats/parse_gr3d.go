@@ -6,7 +6,7 @@ import (
 	"strconv"
 )
 
-var gr3dRe = regexp.MustCompile(`GR3D_FREQ (?P<percentage>\d+)%@?(?P<frequency>\d+)?`)
+var gr3dRe = regexp.MustCompile(`GR3D_FREQ (?P<percentage>\d+)%@?\[?(?P<frequency>\d+)?\]?`)
 var errGR3DNotFound = errors.New("gr3d not found")
 
 func parseGR3D(input string) (*TegraGR3D, error) {
